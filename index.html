@@ -1,32 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>MCU Movie Sorter</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       text-align: center;
       padding: 30px;
+      background-color: #f0f0f0;
+    }
+    h1 {
+      margin-bottom: 10px;
+    }
+    p {
+      margin-top: 0;
+      font-size: 1.2em;
     }
     .movie-buttons {
       display: flex;
       justify-content: center;
-      margin: 20px;
+      flex-wrap: wrap;
+      margin-top: 30px;
     }
-    .movie-buttons button {
-      margin: 10px;
-      padding: 10px 20px;
-      font-size: 16px;
+    .movie-button {
+      margin: 15px;
       cursor: pointer;
       border: none;
-      background-color: #007bff;
-      color: white;
-      border-radius: 5px;
+      background: none;
+      padding: 0;
+      transition: transform 0.2s;
     }
-    .movie-buttons button:hover {
-      background-color: #0056b3;
+    .movie-button:hover {
+      transform: scale(1.05);
+    }
+    .movie-poster {
+      width: 200px;
+      height: auto;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .movie-title {
+      margin-top: 10px;
+      font-size: 1em;
+      color: #333;
     }
   </style>
 </head>
@@ -35,29 +53,160 @@
   <h1>MCU Movie Sorter</h1>
   <p>Which MCU movie would you rather watch right now?</p>
 
-  <div id="movie-buttons" class="movie-buttons">
-    <button id="movie-1">Loading...</button>
-    <button id="movie-2">Loading...</button>
+  <div class="movie-buttons">
+    <button class="movie-button" id="movie-1" onclick="vote(0)">
+      <img id="poster-1" class="movie-poster" src="" alt="Movie Poster">
+      <div id="title-1" class="movie-title"></div>
+    </button>
+    <button class="movie-button" id="movie-2" onclick="vote(1)">
+      <img id="poster-2" class="movie-poster" src="" alt="Movie Poster">
+      <div id="title-2" class="movie-title"></div>
+    </button>
   </div>
 
   <script>
-    const movies = [
-      // Add the list of MCU movies here with links to the posters
-      { title: "Iron Man", poster: "https://link-to-poster.com/iron-man.jpg" },
-      { title: "The Incredible Hulk", poster: "https://link-to-poster.com/incredible-hulk.jpg" },
-      { title: "Iron Man 2", poster: "https://link-to-poster.com/iron-man-2.jpg" },
-      // Add the rest of the MCU movies up to 2025
-    ];
-
-    let currentIndex = 0;
-
-    function setMovies() {
-      document.getElementById('movie-1').textContent = movies[currentIndex].title;
-      document.getElementById('movie-2').textContent = movies[(currentIndex + 1) % movies.length].title;
-    }
-
-    setMovies();
-  </script>
-  
-</body>
-</html>
+const movies = [
+  {
+    title: "Iron Man",
+    poster: "https://m.media-amazon.com/images/M/MV5BMTczNTI5NjYxMV5BMl5BanBnXkFtZTcwODg2MjU1MQ@@._V1_.jpg"
+  },
+  {
+    title: "The Incredible Hulk",
+    poster: "https://m.media-amazon.com/images/M/MV5BMjE0OTY3NjY2Ml5BMl5BanBnXkFtZTcwNjYxNTQ0Mg@@._V1_.jpg"
+  },
+  {
+    title: "Iron Man 2",
+    poster: "https://m.media-amazon.com/images/M/MV5BMTM2NTI5MjYxMF5BMl5BanBnXkFtZTcwNzYxNTI0Mw@@._V1_.jpg"
+  },
+  {
+    title: "Thor",
+    poster: "https://m.media-amazon.com/images/M/MV5BMjEyNzYxNzY2OV5BMl5BanBnXkFtZTcwODg2NzY1NA@@._V1_.jpg"
+  },
+  {
+    title: "Captain America: The First Avenger",
+    poster: "https://m.media-amazon.com/images/M/MV5BMjEyNzYxNzY2OV5BMl5BanBnXkFtZTcwODg2NzY1NA@@._V1_.jpg"
+  },
+  {
+    title: "The Avengers",
+    poster: "https://m.media-amazon.com/images/M/MV5BMTk3MjY3MjYxMF5BMl5BanBnXkFtZTcwNzYxNTI0Mw@@._V1_.jpg"
+  },
+  {
+    title: "Iron Man 3",
+    poster: "https://m.media-amazon.com/images/M/MV5BMTk3MjY3MjYxMF5BMl5BanBnXkFtZTcwNzYxNTI0Mw@@._V1_.jpg"
+  },
+  {
+    title: "Thor: The Dark World",
+    poster: "https://m.media-amazon.com/images/M/MV5BMjEyNzYxNzY2OV5BMl5BanBnXkFtZTcwODg2NzY1NA@@._V1_.jpg"
+  },
+  {
+    title: "Captain America: The Winter Soldier",
+    poster: "https://m.media-amazon.com/images/M/MV5BMjEyNzYxNzY2OV5BMl5BanBnXkFtZTcwODg2NzY1NA@@._V1_.jpg"
+  },
+  {
+    title: "Guardians of the Galaxy",
+    poster: "https://m.media-amazon.com/images/M/MV5BMTk3MjY3MjYxMF5BMl5BanBnXkFtZTcwNzYxNTI0Mw@@._V1_.jpg"
+  },
+  {
+    title: "Avengers: Age of Ultron",
+    poster: "https://m.media-amazon.com/images/M/MV5BMTk3MjY3MjYxMF5BMl5BanBnXkFtZTcwNzYxNTI0Mw@@._V1_.jpg"
+  },
+  {
+    title: "Ant-Man",
+    poster: "https://m.media-amazon.com/images/M/MV5BMTk3MjY3MjYxMF5BMl5BanBnXkFtZTcwNzYxNTI0Mw@@._V1_.jpg"
+  },
+  {
+    title: "Captain America: Civil War",
+    poster: "https://m.media-amazon.com/images/M/MV5BMjEyNzYxNzY2OV5BMl5BanBnXkFtZTcwODg2NzY1NA@@._V1_.jpg"
+  },
+  {
+    title: "Doctor Strange",
+    poster: "https://m.media-amazon.com/images/M/MV5BMjEyNzYxNzY2OV5BMl5BanBnXkFtZTcwODg2NzY1NA@@._V1_.jpg"
+  },
+  {
+    title: "Guardians of the Galaxy Vol. 2",
+    poster: "https://m.media-amazon.com/images/M/MV5BMjEyNzYxNzY2OV5BMl5BanBnXkFtZTcwODg2NzY1NA@@._V1_.jpg"
+  },
+  {
+    title: "Spider-Man: Homecoming",
+    poster: "https://m.media-amazon.com/images/M/MV5BMjEyNzYxNzY2OV5BMl5BanBnXkFtZTcwODg2NzY1NA@@._V1_.jpg"
+  },
+  {
+    title: "Thor: Ragnarok",
+    poster: "https://m.media-amazon.com/images/M/MV5BMjEyNzYxNzY2OV5BMl5BanBnXkFtZTcwODg2NzY1NA@@._V1_.jpg"
+  },
+  {
+    title: "Black Panther",
+    poster: "https://m.media-amazon.com/images/M/MV5BMjEyNzYxNzY2OV5BMl5BanBnXkFtZTcwODg2NzY1NA@@._V1_.jpg"
+  },
+  {
+    title: "Avengers: Infinity War",
+    poster: "https://m.media-amazon.com/images/M/MV5BMjEyNzYxNzY2OV5BMl5BanBnXkFtZTcwODg2NzY1NA@@._V1_.jpg"
+  },
+  {
+    title: "Ant-Man and the Wasp",
+    poster: "https://m.media-amazon.com/images/M/MV5BMjEyNzYxNzY2OV5BMl5BanBnXkFtZTcwODg2NzY1NA@@._V1_.jpg"
+  },
+  {
+    title: "Captain Marvel",
+    poster: "https://m.media-amazon.com/images/M/MV5BMjEyNzYxNzY2OV5BMl5BanBnXkFtZTcwODg2NzY1NA@@._V1_.jpg"
+  },
+  {
+    title: "Avengers: Endgame",
+    poster: "https://m.media-amazon.com/images/M/MV5BMjEyNzYxNzY2OV5BMl5BanBnXkFtZTcwODg2NzY1NA@@._V1_.jpg"
+  },
+  {
+    title: "Spider-Man: Far From Home",
+    poster: "https://m.media-amazon.com/images/M/MV5BMjEyNzYxNzY2OV5BMl5BanBnXkFtZTcwODg2NzY1NA@@._V1_.jpg"
+  },
+  {
+    title: "Black Widow",
+    poster: "https://m.media-amazon.com/images/M/MV5BMjEyNzYxNzY2OV5BMl5BanBnXkFtZTcwODg2NzY1NA@@._V1_.jpg"
+  },
+  {
+    title: "Shang-Chi and the Legend of the Ten Rings",
+    poster: "https://m.media-amazon.com/images/M/MV5BMjEyNzYxNzY2OV5BMl5BanBnXkFtZTcwODg2NzY1NA@@._V1_.jpg"
+  },
+  {
+    title: "Eternals",
+    poster: "https://m.media-amazon.com/images/M/MV5BMjEyNzYxNzY2OV5BMl5BanBnXkFtZTcwODg2NzY1NA@@._V1_.jpg"
+  },
+  {
+    title: "Spider-Man: No Way Home",
+    poster: "https://m.media-amazon.com/images/M/MV5BMjEyNzYxNzY2OV5BMl5BanBnXkFtZTcwODg2NzY1NA@@._V1_.jpg"
+  },
+  {
+    title: "Doctor Strange in the Multiverse of Madness",
+    poster: "https://m.media-amazon.com/images/M/MV5BMjEyNzYxNzY2OV5BMl5BanBnXkFtZTcwODg2NzY1NA@@._V1_.jpg"
+  },
+  {
+    title: "Thor: Love and Thunder",
+    poster: "https://m.media-amazon.com/images/M/MV5BMjEyNzYxNzY2OV5BMl5BanBnXkFtZTcwODg2NzY1NA@@._V1_.jpg"
+  },
+  {
+    title: "Black Panther: Wakanda Forever",
+    poster: "https://m.media-amazon.com/images/M/MV5BMjEyNzYxNzY2OV5BMl5BanBnXkFtZTcwODg2NzY1NA@@._V1_.jpg"
+  },
+  {
+    title: "Ant-Man and the Wasp: Quantumania",
+    poster: "https://m.media-amazon.com/images/M/MV5BMjEyNzYxNzY2OV5BMl5BanBnXkFtZTcwODg2NzY1NA@@._V1_.jpg"
+  },
+  {
+    title: "Guardians of the Galaxy Vol. 3",
+    poster: "https://m.media-amazon.com/images/M/MV5BMjEyNzYxNzY2OV5BMl5BanBnXkFtZTcwODg2NzY1NA@@._V1_.jpg"
+  },
+  {
+    title: "The Marvels",
+    poster: "https://m.media-amazon.com/images/M/MV5BMjEyNzYxNzY2OV5BMl5BanBnXkFtZTcwODg2NzY1NA@@._V1_.jpg"
+  },
+  {
+    title: "Deadpool & Wolverine",
+    poster: "https://m.media-amazon.com/images/M/MV5BMjEyNzYxNzY2OV5BMl5BanBnXkFtZTcwODg2NzY1NA@@._V1_.jpg"
+  },
+  {
+    title: "Captain America: Brave New World",
+    poster: "https://m.media-amazon.com/images/M/MV5BNzZkZjUyODUtZTc2ZC00YWE2LTkzNzUtZGRkNTcwOTYxZDJmXkEyXkFqcGdeQXVyMTUzMTg2ODkz._V1_.jpg"
+  }
+  {,
+    title: "Thunderbolts*",
+    poster: "https://m.media-amazon.com/images/M/MV5BZDg3Y2IzYzgtMzdlYy00Zjc2LTg1NWMtODkxYTkwZDY5YzViXkEyXkFqcGdeQXVyMTUzMTg2ODkz._V1_.jpg"
+  }
