@@ -47,12 +47,27 @@
       text-align: left;
       display: inline-block;
     }
+    #progress-container {
+      width: 100%;
+      background-color: #e0e0e0;
+      height: 20px;
+      border-radius: 10px;
+      margin: 20px 0;
+      overflow: hidden;
+    }
+
+    #progress-bar {
+      height: 100%;
+      width: 0%;
+      background-color: #007bff;
+      transition: width 0.3s ease-in-out;
+    }
   </style>
 </head>
 <body>
 
-  <h1>MCU Movie Forced Ranking</h1>
-  <p>Which would you rather watch right now?</p>
+  <h1>MCU Movie Ranking - Summer 2025</h1>
+  <p>Which MCU movie would you rather watch right now?</p>
 
   <div id="choices"></div>
 
@@ -156,7 +171,26 @@
     }
 
     showNextPair();
-  </script>
 
-</body>
+    <div id="progress-container">
+  <div id="progress-bar"></div>
+</div>
+    
+  </script>
+    let currentStep = 0;
+    const totalSteps = 10;  // Adjust as necessary
+
+    function updateProgress() {
+      const progressBar = document.getElementById("progress-bar");
+      const percent = (currentStep / totalSteps) * 100;
+      progressBar.style.width = percent + "%";
+    }
+
+    // Call this function each time the user completes a choice
+    function userMadeChoice() {
+      currentStep++;
+      updateProgress();
+      // Load the next matchup, etc.
+    }
+</body>  
 </html>
