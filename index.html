@@ -2,250 +2,100 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>MCU Movie Sorter</title>
+  <title>MCU Movie Ranking</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 30px;
-      background-color: #f0f0f0;
-    }
-    h1 {
-      margin-bottom: 10px;
-    }
-    p {
-      margin-top: 0;
-      font-size: 1.2em;
-    }
-    .movie-buttons {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin-top: 30px;
-    }
-    .movie-button {
-      margin: 15px;
-      cursor: pointer;
+    body { font-family: Arial; text-align: center; padding: 40px; background: #f4f4f4; }
+    .choice-button {
+      display: inline-block;
+      margin: 20px;
+      padding: 20px 40px;
+      background-color: #007bff;
+      color: white;
       border: none;
-      background: none;
-      padding: 0;
-      transition: transform 0.2s;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 18px;
     }
-    .movie-button:hover {
-      transform: scale(1.05);
+    .choice-button:hover {
+      background-color: #0056b3;
     }
-    .movie-poster {
-      width: 200px;
-      height: auto;
-      border-radius: 10px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }
-    .movie-title {
-      margin-top: 10px;
-      font-size: 1em;
-      color: #333;
-    }
+    #results { margin-top: 40px; }
+    h2 { margin-top: 50px; }
   </style>
 </head>
 <body>
-
-  <h1>MCU Movie Sorter</h1>
-  <p>Which MCU movie would you rather watch right now?</p>
-
-  <div class="movie-buttons">
-    <button class="movie-button" id="movie-1" onclick="vote(0)">
-      <img id="poster-1" class="movie-poster" src="" alt="Movie Poster">
-      <div id="title-1" class="movie-title"></div>
-    </button>
-    <button class="movie-button" id="movie-2" onclick="vote(1)">
-      <img id="poster-2" class="movie-poster" src="" alt="Movie Poster">
-      <div id="title-2" class="movie-title"></div>
-    </button>
+  <h1>Which MCU Movie Would You Rather Watch?</h1>
+  <div id="comparison">
+    <button class="choice-button" id="option1" onclick="vote(0)"></button>
+    <button class="choice-button" id="option2" onclick="vote(1)"></button>
   </div>
+  <div id="results"></div>
 
   <script>
-const movies = [
-  {
-    title: "Iron Man",
-    poster: "https://image.tmdb.org/t/p/w500/78lPtwv72eTNqFW9COBYI0dWDJa.jpg"
-  }
-];
+    const movies = [
+      "Iron Man", "The Incredible Hulk", "Iron Man 2", "Thor", "Captain America: The First Avenger",
+      "The Avengers", "Iron Man 3", "Thor: The Dark World", "Captain America: The Winter Soldier",
+      "Guardians of the Galaxy", "Avengers: Age of Ultron", "Ant-Man", "Captain America: Civil War",
+      "Doctor Strange", "Guardians of the Galaxy Vol. 2", "Spider-Man: Homecoming", "Thor: Ragnarok",
+      "Black Panther", "Avengers: Infinity War", "Ant-Man and the Wasp", "Captain Marvel",
+      "Avengers: Endgame", "Spider-Man: Far From Home", "Black Widow",
+      "Shang-Chi and the Legend of the Ten Rings", "Eternals", "Spider-Man: No Way Home",
+      "Doctor Strange in the Multiverse of Madness", "Thor: Love and Thunder",
+      "Black Panther: Wakanda Forever", "Ant-Man and the Wasp: Quantumania",
+      "Guardians of the Galaxy Vol. 3", "The Marvels", "Deadpool & Wolverine",
+      "Captain America: Brave New World", "Thunderbolts*"
+    ];
 
-const container = document.getElementById('movie-container');
+    let scores = {};
+    movies.forEach(m => scores[m] = 1000); // base Elo rating
 
-movies.forEach(movie => {
-  const movieDiv = document.createElement('div');
-  movieDiv.classList.add('movie');
+    function getRandomPair() {
+      let a = Math.floor(Math.random() * movies.length);
+      let b;
+      do {
+        b = Math.floor(Math.random() * movies.length);
+      } while (b === a);
+      return [movies[a], movies[b]];
+    }
 
-  const img = document.createElement('img');
-  img.src = movie.poster;
-  img.alt = `${movie.title} Poster`;
+    let currentPair = getRandomPair();
 
-  const title = document.createElement('p');
-  title.textContent = movie.title;
+    function showPair() {
+      document.getElementById("option1").innerText = currentPair[0];
+      document.getElementById("option2").innerText = currentPair[1];
+    }
 
-  movieDiv.appendChild(img);
-  movieDiv.appendChild(title);
-  container.appendChild(movieDiv);
-});
-  {
-    title: "The Incredible Hulk",
-    poster: "https://image.tmdb.org/t/p/w500/2vYf9yL5lF0xQ9t9i7eF8Y1g3xG.jpg"
-  }
-];
+    function vote(winnerIndex) {
+      const winner = currentPair[winnerIndex];
+      const loser = currentPair[1 - winnerIndex];
+      updateScores(winner, loser);
+      currentPair = getRandomPair();
+      showPair();
+    }
 
-const container = document.getElementById('movie-container');
+    function updateScores(winner, loser) {
+      const k = 32;
+      const ratingWinner = scores[winner];
+      const ratingLoser = scores[loser];
+      const expectedWinner = 1 / (1 + Math.pow(10, (ratingLoser - ratingWinner) / 400));
+      const expectedLoser = 1 - expectedWinner;
+      scores[winner] = ratingWinner + k * (1 - expectedWinner);
+      scores[loser] = ratingLoser + k * (0 - expectedLoser);
+    }
 
-movies.forEach(movie => {
-  const movieDiv = document.createElement('div');
-  movieDiv.classList.add('movie');
+    function showResults() {
+      const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+      const resultDiv = document.getElementById("results");
+      resultDiv.innerHTML = "<h2>Your Ranked MCU List</h2><ol>" +
+        sorted.map(entry => `<li>${entry[0]} (${Math.round(entry[1])})</li>`).join('') +
+        "</ol>";
+    }
 
-  const img = document.createElement('img');
-  img.src = movie.poster;
-  img.alt = `${movie.title} Poster`;
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "r") showResults(); // press "r" to view results
+    });
 
-  const title = document.createElement('p');
-  title.textContent = movie.title;
-
-  movieDiv.appendChild(img);
-  movieDiv.appendChild(title);
-  container.appendChild(movieDiv);
-});
-  {
-    title: "Iron Man 2",
-    poster: "https://image.tmdb.org/t/p/w500/6WBeq4fCfn7AN0o21W9qNcRF2l9.jpg"
-  },
-  {
-    title: "Thor",
-    poster: "https://image.tmdb.org/t/p/w500/prSfAi1xGrhLQNxVSUFh61xQ4Qy.jpg"
-  },
-  {
-    title: "Captain America: The First Avenger",
-    poster: "https://image.tmdb.org/t/p/w500/vSNxAJTlD0r02V9sPYpOjqDZXUK.jpg"
-  },
-  {
-    title: "The Avengers",
-    poster: "https://image.tmdb.org/t/p/w500/RYMX2wcKCBAr24UyPD7xwmjaTn.jpg"
-  },
-  {
-    title: "Iron Man 3",
-    poster: "https://image.tmdb.org/t/p/w500/1Ilv6ryHUv6rt9zIsbSEJUmmbEi.jpg"
-  },
-  {
-    title: "Thor: The Dark World",
-    poster: "https://image.tmdb.org/t/p/w500/5gJkVIVU7FDp7AfRAbPSvvdbQx9.jpg"
-  },
-  {
-    title: "Captain America: The Winter Soldier",
-    poster: "https://image.tmdb.org/t/p/w500/tVFRpFw3xTedgPGqxW0AOI8Qhh0.jpg"
-  },
-  {
-    title: "Guardians of the Galaxy",
-    poster: "https://image.tmdb.org/t/p/w500/r7vmZjiyZw9rpJMQJdXpjgiCOk9.jpg"
-  },
-  {
-    title: "Avengers: Age of Ultron",
-    poster: "https://image.tmdb.org/t/p/w500/4ssDuvEDkSArWEdyBl2X5EHvYKU.jpg"
-  },
-  {
-    title: "Ant-Man",
-    poster: "https://image.tmdb.org/t/p/w500/D6e8RJf2qUstnfkTslTXNTUAlT.jpg"
-  },
-  {
-    title: "Captain America: Civil War",
-    poster: "https://image.tmdb.org/t/p/w500/rAGiXaUfPzY7CDEyNKUofk3Kw2e.jpg"
-  },
-  {
-    title: "Doctor Strange",
-    poster: "https://image.tmdb.org/t/p/w500/uGBVj3bEbCoZbDjjl9wTxcygko1.jpg"
-  },
-  {
-    title: "Guardians of the Galaxy Vol. 2",
-    poster: "https://image.tmdb.org/t/p/w500/y4MBh0EjBlMuOzv9axM4qJlmhzz.jpg"
-  },
-  {
-    title: "Spider-Man: Homecoming",
-    poster: "https://image.tmdb.org/t/p/w500/c24sv2weTHPsmDa7jEMN0m2P3RT.jpg"
-  },
-  {
-    title: "Thor: Ragnarok",
-    poster: "https://image.tmdb.org/t/p/w500/rzRwTcFvttcN1ZpX2xv4j3tSdJu.jpg"
-  },
-  {
-    title: "Black Panther",
-    poster: "https://image.tmdb.org/t/p/w500/uxzzxijgPIY7slzFvMotPv8wjKA.jpg"
-  },
-  {
-    title: "Avengers: Infinity War",
-    poster: "https://image.tmdb.org/t/p/w500/7WsyChQLEftFiDOVTGkv3hFpyyt.jpg"
-  },
-  {
-    title: "Ant-Man and the Wasp",
-    poster: "https://image.tmdb.org/t/p/w500/eivQmS3wqzqnQWILHLc4FsEfcXP.jpg"
-  },
-  {
-    title: "Captain Marvel",
-    poster: "https://image.tmdb.org/t/p/w500/AtsgWhDnHTq68L0lLsUrCnM7TjG.jpg"
-  },
-  {
-    title: "Avengers: Endgame",
-    poster: "https://image.tmdb.org/t/p/w500/or06FN3Dka5tukK1e9sl16pB3iy.jpg"
-  },
-  {
-    title: "Spider-Man: Far From Home",
-    poster: "https://image.tmdb.org/t/p/w500/lcq8dVxeeOqHvvgcte707K0KVx5.jpg"
-  },
-  {
-    title: "Black Widow",
-    poster: "https://image.tmdb.org/t/p/w500/qAZ0pzat24kLdO3o8ejmbLxyOac.jpg"
-  },
-  {
-    title: "Shang-Chi and the Legend of the Ten Rings",
-    poster: "https://image.tmdb.org/t/p/w500/1BIoJGKbXjdFDAqUEiA2VHqkK1Z.jpg"
-  },
-  {
-    title: "Eternals",
-    poster: "https://image.tmdb.org/t/p/w500/b6qUu00iIIkXX13szFy7d0CyNcg.jpg"
-  },
-  {
-    title: "Spider-Man: No Way Home",
-    poster: "https://image.tmdb.org/t/p/w500/1g0dhYtq4irTY1GPXvft6k4YLjm.jpg"
-  },
-  {
-    title: "Doctor Strange in the Multiverse of Madness",
-    poster: "https://image.tmdb.org/t/p/w500/9Gtg2DzBhmYamXBS1hKAhiwbBKS.jpg"
-  },
-  {
-    title: "Thor: Love and Thunder",
-    poster: "https://image.tmdb.org/t/p/w500/pIkRyD18kl4FhoCNQuWxWu5cBLM.jpg"
-  },
-  {
-    title: "Black Panther: Wakanda Forever",
-    poster: "https://image.tmdb.org/t/p/w500/sv1xJUazXeYqALzczSZ3O6nkH75.jpg"
-  },
-  {
-    title: "Ant-Man and the Wasp: Quantumania",
-    poster: "https://image.tmdb.org/t/p/w500/qnqGbB22YJ7dSs4o6M7exTpNxPz.jpg"
-  },
-  {
-    title: "Guardians of the Galaxy Vol. 3",
-    poster: "https://image.tmdb.org/t/p/w500/r2J02Z2OpNTctfOSN1Ydgii51I3.jpg"
-  },
-  {
-    title: "The Marvels",
-    poster: "https://image.tmdb.org/t/p/w500/8YFL5QQVPy3AgrEQxNYVSgiPEbe.jpg"
-  },
-  {
-    title: "Deadpool & Wolverine",
-    poster: "https://image.tmdb.org/t/p/w500/placeholder.jpg"
-  },
-  {
-    title: "Captain America: Brave New World",
-    poster: "https://image.tmdb.org/t/p/w500/placeholder.jpg"
-  },
-  {
-    title: "Thunderbolts*",
-    poster: "https://image.tmdb.org/t/p/w500/placeholder.jpg"
-  }
-];
+    showPair();
+  </script>
+</body>
+</html>
