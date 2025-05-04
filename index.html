@@ -1,101 +1,162 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>MCU Movie Ranking</title>
+  <meta charset="UTF-8">
+  <title>MCU Movie Forced Ranking</title>
   <style>
-    body { font-family: Arial; text-align: center; padding: 40px; background: #f4f4f4; }
-    .choice-button {
-      display: inline-block;
-      margin: 20px;
-      padding: 20px 40px;
-      background-color: #007bff;
-      color: white;
-      border: none;
-      border-radius: 8px;
+    body {
+      background-color: #111;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    h1 {
+      color: #e62429;
+    }
+    #choices {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      margin-top: 30px;
+      flex-wrap: wrap;
+    }
+    .movie-option {
       cursor: pointer;
-      font-size: 18px;
+      width: 200px;
+      border: 2px solid transparent;
+      border-radius: 10px;
+      transition: transform 0.3s, border 0.3s;
     }
-    .choice-button:hover {
-      background-color: #0056b3;
+    .movie-option:hover {
+      transform: scale(1.05);
+      border-color: #e62429;
     }
-    #results { margin-top: 40px; }
-    h2 { margin-top: 50px; }
+    .movie-option img {
+      width: 100%;
+      border-radius: 10px;
+    }
+    .movie-title {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    #result {
+      margin-top: 40px;
+    }
+    ol {
+      text-align: left;
+      display: inline-block;
+    }
   </style>
 </head>
 <body>
-  <h1>Which MCU Movie Would You Rather Watch?</h1>
-  <div id="comparison">
-    <button class="choice-button" id="option1" onclick="vote(0)"></button>
-    <button class="choice-button" id="option2" onclick="vote(1)"></button>
-  </div>
-  <div id="results"></div>
+
+  <h1>MCU Movie Forced Ranking</h1>
+  <p>Which would you rather watch right now?</p>
+
+  <div id="choices"></div>
+
+  <div id="result"></div>
 
   <script>
     const movies = [
-      "Iron Man", "The Incredible Hulk", "Iron Man 2", "Thor", "Captain America: The First Avenger",
-      "The Avengers", "Iron Man 3", "Thor: The Dark World", "Captain America: The Winter Soldier",
-      "Guardians of the Galaxy", "Avengers: Age of Ultron", "Ant-Man", "Captain America: Civil War",
-      "Doctor Strange", "Guardians of the Galaxy Vol. 2", "Spider-Man: Homecoming", "Thor: Ragnarok",
-      "Black Panther", "Avengers: Infinity War", "Ant-Man and the Wasp", "Captain Marvel",
-      "Avengers: Endgame", "Spider-Man: Far From Home", "Black Widow",
-      "Shang-Chi and the Legend of the Ten Rings", "Eternals", "Spider-Man: No Way Home",
-      "Doctor Strange in the Multiverse of Madness", "Thor: Love and Thunder",
-      "Black Panther: Wakanda Forever", "Ant-Man and the Wasp: Quantumania",
-      "Guardians of the Galaxy Vol. 3", "The Marvels", "Deadpool & Wolverine",
-      "Captain America: Brave New World", "Thunderbolts*"
+  { title: "Iron Man", poster: "https://m.media-amazon.com/images/M/MV5BMTczOTMzNDMyNF5BMl5BanBnXkFtZTcwNTU1NzMzMw@@._V1_.jpg" },
+  { title: "The Incredible Hulk", poster: "https://m.media-amazon.com/images/M/MV5BMTc5NzI1NTQ3OV5BMl5BanBnXkFtZTcwNzYwNzQyMg@@._V1_.jpg" },
+  { title: "Iron Man 2", poster: "https://m.media-amazon.com/images/M/MV5BMTM0MDgwNjI4NF5BMl5BanBnXkFtZTcwNTU3Njg3Mw@@._V1_.jpg" },
+  { title: "Thor", poster: "https://m.media-amazon.com/images/M/MV5BMjEyMjYxNzE2Ml5BMl5BanBnXkFtZTcwODg1MTY0NA@@._V1_.jpg" },
+  { title: "Captain America: The First Avenger", poster: "https://m.media-amazon.com/images/M/MV5BMTk1NTM1MTk3N15BMl5BanBnXkFtZTcwNTU0NTY0NQ@@._V1_.jpg" },
+  { title: "The Avengers", poster: "https://m.media-amazon.com/images/M/MV5BMjExMTE1NzI5Nl5BMl5BanBnXkFtZTcwODc4OTI3Nw@@._V1_.jpg" },
+  { title: "Iron Man 3", poster: "https://m.media-amazon.com/images/M/MV5BMTk3OTI3MzEyN15BMl5BanBnXkFtZTcwNTg1NzQzOQ@@._V1_.jpg" },
+  { title: "Thor: The Dark World", poster: "https://m.media-amazon.com/images/M/MV5BMTQ2NjU1NTg0OF5BMl5BanBnXkFtZTgwNjk4NjQxMDE@._V1_.jpg" },
+  { title: "Captain America: The Winter Soldier", poster: "https://m.media-amazon.com/images/M/MV5BMTY4NDY3MjI3Nl5BMl5BanBnXkFtZTgwNjk1NzE3MDE@._V1_.jpg" },
+  { title: "Guardians of the Galaxy", poster: "https://m.media-amazon.com/images/M/MV5BNzA5ZDI3MzYtOTAzYS00ZDc3LWFkNzAtNzM4NzA3OTUwYzZmXkEyXkFqcGdeQXVyNTIzOTk5ODM@._V1_.jpg" },
+  { title: "Avengers: Age of Ultron", poster: "https://m.media-amazon.com/images/M/MV5BMTUwODI2MjExNF5BMl5BanBnXkFtZTgwNzU1NzE3MTE@._V1_.jpg" },
+  { title: "Ant-Man", poster: "https://m.media-amazon.com/images/M/MV5BMjI5NTgzNTI3NF5BMl5BanBnXkFtZTgwMDUyNzk1NDE@._V1_.jpg" },
+  { title: "Captain America: Civil War", poster: "https://m.media-amazon.com/images/M/MV5BMTQzNjQxMzgzM15BMl5BanBnXkFtZTgwNjUzNjg3NzE@._V1_.jpg" },
+  { title: "Doctor Strange", poster: "https://m.media-amazon.com/images/M/MV5BMTg4OTI5OTQ0MV5BMl5BanBnXkFtZTgwMzQ2NzY3MDI@._V1_.jpg" },
+  { title: "Guardians of the Galaxy Vol. 2", poster: "https://m.media-amazon.com/images/M/MV5BMjQ1Njk0NjgxOV5BMl5BanBnXkFtZTgwNzY1NzYyMjI@._V1_.jpg" },
+  { title: "Spider-Man: Homecoming", poster: "https://m.media-amazon.com/images/M/MV5BMTk5NzAxMzMyMl5BMl5BanBnXkFtZTgwNjkzODg2MjI@._V1_.jpg" },
+  { title: "Thor: Ragnarok", poster: "https://m.media-amazon.com/images/M/MV5BNzA2NzAxMjAtYTZkZC00NmQ4LTgwY2ItY2Y1NmFkZTExMmZlXkEyXkFqcGdeQXVyNTQ0NjQzNTE@._V1_.jpg" },
+  { title: "Black Panther", poster: "https://m.media-amazon.com/images/M/MV5BMTg1MTQ2ODI3MF5BMl5BanBnXkFtZTgwODk5NjQ1NDM@._V1_.jpg" },
+  { title: "Avengers: Infinity War", poster: "https://m.media-amazon.com/images/M/MV5BMjMxNjY2MDU1OF5BMl5BanBnXkFtZTgwNzY1MTUwNTM@._V1_.jpg" },
+  { title: "Ant-Man and the Wasp", poster: "https://m.media-amazon.com/images/M/MV5BMjMxOTI4NjQ0MF5BMl5BanBnXkFtZTgwOTUzODg5NTM@._V1_.jpg" },
+  { title: "Captain Marvel", poster: "https://m.media-amazon.com/images/M/MV5BMjMxNjYxNjgyMF5BMl5BanBnXkFtZTgwNDM5NDM2NjM@._V1_.jpg" },
+  { title: "Avengers: Endgame", poster: "https://m.media-amazon.com/images/M/MV5BMjMxNjYxNjU4MV5BMl5BanBnXkFtZTgwODc4MDcyNzM@._V1_.jpg" },
+  { title: "Spider-Man: Far From Home", poster: "https://m.media-amazon.com/images/M/MV5BMGViMDZmZGItY2NkMy00YjA3LWIwZDQtODdiOGFjMGEzZjg0XkEyXkFqcGdeQXVyMTkxNjUyNQ@@._V1_.jpg" },
+  { title: "Black Widow", poster: "https://m.media-amazon.com/images/M/MV5BZDczZGEzNzEtNGEwMC00YmYyLTk4YzgtNDkxZDAwZjM0NTI5XkEyXkFqcGdeQXVyMTkxNjUyNQ@@._V1_.jpg" },
+  { title: "Shang-Chi and the Legend of the Ten Rings", poster: "https://m.media-amazon.com/images/M/MV5BZDVmMWYxODItYmJhNC00MTIxLTk3OTAtMDY0OTgzYzQ0YzlmXkEyXkFqcGdeQXVyMTkxNjUyNQ@@._V1_.jpg" },
+  { title: "Eternals", poster: "https://m.media-amazon.com/images/M/MV5BNDI3NmRkNzUtY2M1Yy00MzRhLWExMTAtMjg0N2QxY2Q2ZTgzXkEyXkFqcGdeQXVyMTkxNjUyNQ@@._V1_.jpg" },
+  { title: "Spider-Man: No Way Home", poster: "https://m.media-amazon.com/images/M/MV5BZDZmY2YxOTUtYjEwYy00NzA3LTkyMWEtZDA1YmNiNDgzNzlkXkEyXkFqcGdeQXVyMTkxNjUyNQ@@._V1_.jpg" },
+  { title: "Doctor Strange in the Multiverse of Madness", poster: "https://m.media-amazon.com/images/M/MV5BMGMxNTkzZWItMTgzNy00ZmY5LWI2YjQtODAyZGU2N2ZhMDcwXkEyXkFqcGdeQXVyMTkxNjUyNQ@@._V1_.jpg" },
+  { title: "Thor: Love and Thunder", poster: "https://m.media-amazon.com/images/M/MV5BMjM1OGM2OTgtNmU5Zi00MDIzLTkxYmUtNmYwNzRjOWVkNzAxXkEyXkFqcGdeQXVyMTkxNjUyNQ@@._V1_.jpg" },
+  { title: "Black Panther: Wakanda Forever", poster: "https://m.media-amazon.com/images/M/MV5BMzYzNmE2OTctMjVmYy00NGQ3LTg1MmYtZTRjYzRkNDNmYTI1XkEyXkFqcGdeQXVyMTkxNjUyNQ@@._V1_.jpg" },
+  { title: "Ant-Man and the Wasp: Quantumania", poster: "https://m.media-amazon.com/images/M/MV5BY2NlZjAwNjktYjkwNy00YzQ5LThjZDYtN2IwOGI0YjFkMzMyXkEyXkFqcGdeQXVyMTkxNjUyNQ@@._V1_.jpg" },
+  { title: "Guardians of the Galaxy Vol. 3", poster: "https://m.media-amazon.com/images/M/MV5BZGJlZmNhN2QtZDAzOC00ZDg4LTk0NzEtNmJjMmEyZjc1MmFjXkEyXkFqcGdeQXVyMTkxNjUyNQ@@._V1_.jpg" },
+  { title: "The Marvels", poster: "https://m.media-amazon.com/images/M/MV5BZWFiNjM3MDgtNjQwNC00NGE2LWExYzEtYzRlNzM4NjE1MTA0XkEyXkFqcGdeQXVyMTkxNjUyNQ@@._V1_.jpg" },
+  { title: "Deadpool & Wolverine", poster: "https://m.media-amazon.com/images/M/MV5BNTAzMTllMDUtZDc2Mi00NmY3LWFmNmYtNTVjNDk5YzRiNzliXkEyXkFqcGdeQXVyNjA5NDg5MDI@._V1_.jpg" },
+  { title: "Captain America: Brave New World", poster: "https://m.media-amazon.com/images/M/MV5BMTdkYTU4NDctOTg1Zi00ZTBiLThhNTgtNmY4NmRhODhjNDUzXkEyXkFqcGdeQXVyMTg5NDcwNjI@._V1_.jpg" },
+  { title: "Thunderbolts*", poster: "https://m.media-amazon.com/images/M/MV5BZmU0ZTc2MjUtNzQwOS00ZjRmLTg3OTgtZjkzYzJkNzJjMmY2XkEyXkFqcGdeQXVyNjg0NjYyOTE@._V1_.jpg" }
     ];
 
     let scores = {};
-    movies.forEach(m => scores[m] = 1000); // base Elo rating
+    let remainingPairs = [];
 
-    function getRandomPair() {
-      let a = Math.floor(Math.random() * movies.length);
-      let b;
-      do {
-        b = Math.floor(Math.random() * movies.length);
-      } while (b === a);
-      return [movies[a], movies[b]];
+    movies.forEach(movie => {
+      scores[movie.title] = 0;
+    });
+
+    function shuffle(arr) {
+      return arr.sort(() => Math.random() - 0.5);
     }
 
-    let currentPair = getRandomPair();
-
-    function showPair() {
-      document.getElementById("option1").innerText = currentPair[0];
-      document.getElementById("option2").innerText = currentPair[1];
+    function generatePairs() {
+      let pairs = [];
+      for (let i = 0; i < movies.length; i++) {
+        for (let j = i + 1; j < movies.length; j++) {
+          pairs.push([movies[i], movies[j]]);
+        }
+      }
+      return shuffle(pairs);
     }
 
-    function vote(winnerIndex) {
-      const winner = currentPair[winnerIndex];
-      const loser = currentPair[1 - winnerIndex];
-      updateScores(winner, loser);
-      currentPair = getRandomPair();
-      showPair();
-    }
+    remainingPairs = generatePairs();
 
-    function updateScores(winner, loser) {
-      const k = 32;
-      const ratingWinner = scores[winner];
-      const ratingLoser = scores[loser];
-      const expectedWinner = 1 / (1 + Math.pow(10, (ratingLoser - ratingWinner) / 400));
-      const expectedLoser = 1 - expectedWinner;
-      scores[winner] = ratingWinner + k * (1 - expectedWinner);
-      scores[loser] = ratingLoser + k * (0 - expectedLoser);
+    function showNextPair() {
+      if (remainingPairs.length === 0) {
+        showResults();
+        return;
+      }
+
+      const [movieA, movieB] = remainingPairs.pop();
+      const container = document.getElementById("choices");
+      container.innerHTML = "";
+
+      [movieA, movieB].forEach(movie => {
+        const div = document.createElement("div");
+        div.className = "movie-option";
+        div.innerHTML = `
+          <img src="${movie.img}" alt="${movie.title}">
+          <div class="movie-title">${movie.title}</div>
+        `;
+        div.addEventListener("click", () => {
+          scores[movie.title]++;
+          showNextPair();
+        });
+        container.appendChild(div);
+      });
     }
 
     function showResults() {
+      const resultDiv = document.getElementById("result");
       const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
-      const resultDiv = document.getElementById("results");
-      resultDiv.innerHTML = "<h2>Your Ranked MCU List</h2><ol>" +
-        sorted.map(entry => `<li>${entry[0]} (${Math.round(entry[1])})</li>`).join('') +
+
+      resultDiv.innerHTML = "<h2>Your Ranked List:</h2><ol>" +
+        sorted.map(([title]) => `<li>${title}</li>`).join("") +
         "</ol>";
     }
 
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "r") showResults(); // press "r" to view results
-    });
-
-    showPair();
+    showNextPair();
   </script>
+
 </body>
 </html>
