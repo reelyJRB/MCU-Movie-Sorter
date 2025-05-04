@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MCU Movie Sorter</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 30px;
+    }
+    .movie-buttons {
+      display: flex;
+      justify-content: center;
+      margin: 20px;
+    }
+    .movie-buttons button {
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+      background-color: #007bff;
+      color: white;
+      border-radius: 5px;
+    }
+    .movie-buttons button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>MCU Movie Sorter</h1>
+  <p>Which MCU movie would you rather watch right now?</p>
+
+  <div id="movie-buttons" class="movie-buttons">
+    <button id="movie-1">Loading...</button>
+    <button id="movie-2">Loading...</button>
+  </div>
+
+  <script>
+    const movies = [
+      // Add the list of MCU movies here with links to the posters
+      { title: "Iron Man", poster: "https://link-to-poster.com/iron-man.jpg" },
+      { title: "The Incredible Hulk", poster: "https://link-to-poster.com/incredible-hulk.jpg" },
+      { title: "Iron Man 2", poster: "https://link-to-poster.com/iron-man-2.jpg" },
+      // Add the rest of the MCU movies up to 2025
+    ];
+
+    let currentIndex = 0;
+
+    function setMovies() {
+      document.getElementById('movie-1').textContent = movies[currentIndex].title;
+      document.getElementById('movie-2').textContent = movies[(currentIndex + 1) % movies.length].title;
+    }
+
+    setMovies();
+  </script>
+  
+</body>
+</html>
