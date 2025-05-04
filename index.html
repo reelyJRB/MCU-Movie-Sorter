@@ -113,84 +113,75 @@
   { title: "Thunderbolts*", poster: "https://m.media-amazon.com/images/M/MV5BZmU0ZTc2MjUtNzQwOS00ZjRmLTg3OTgtZjkzYzJkNzJjMmY2XkEyXkFqcGdeQXVyNjg0NjYyOTE@._V1_.jpg" }
     ];
 
-    let scores = {};
-    let remainingPairs = [];
+    let remainingComparisons = [];
+  let ranking = [];
 
-    movies.forEach(movie => {
-      scores[movie.title] = 0;
+  function initializeComparisons() {
+    // Create all unique pairs
+    for (let i = 0; i < movies.length; i++) {
+      for (let j = i + 1; j < movies.length; j++) {
+        remainingComparisons.push([movies[i], movies[j]]);
+      }
+    }
+
+    // Shuffle comparisons
+    for (let i = remainingComparisons.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [remainingComparisons[i], remainingComparisons[j]] = [remainingComparisons[j], remainingComparisons[i]];
+    }
+
+    ranking = movies.map(movie => ({ title: movie.title, score: 0 }));
+    showNextComparison();
+  }
+
+  function showNextComparison() {
+    const choicesDiv = document.getElementById('choices');
+    choicesDiv.innerHTML = '';
+
+    if (remainingComparisons.length === 0) {
+      showResults();
+      return;
+    }
+
+    const [movie1, movie2] = remainingComparisons.pop();
+
+    [movie1, movie2].forEach(movie => {
+      const div = document.createElement('div');
+      div.className = 'movie-option';
+      div.innerHTML = `
+        <img src="${movie.poster}" alt="${movie.title}">
+        <div class="movie-title">${movie.title}</div>
+      `;
+      div.onclick = () => handleChoice(movie, movie === movie1 ? movie2 : movie1);
+      choicesDiv.appendChild(div);
     });
 
-    function shuffle(arr) {
-      return arr.sort(() => Math.random() - 0.5);
-    }
+    updateProgressBar();
+  }
 
-    function generatePairs() {
-      let pairs = [];
-      for (let i = 0; i < movies.length; i++) {
-        for (let j = i + 1; j < movies.length; j++) {
-          pairs.push([movies[i], movies[j]]);
-        }
-      }
-      return shuffle(pairs);
-    }
+  function handleChoice(winner, loser) {
+    const winnerEntry = ranking.find(m => m.title === winner.title);
+    winnerEntry.score++;
+    showNextComparison();
+  }
 
-    remainingPairs = generatePairs();
+  function showResults() {
+    ranking.sort((a, b) => b.score - a.score);
+    const resultDiv = document.getElementById('result');
+    resultDiv.innerHTML = `
+      <h2>Your MCU Movie Rankings</h2>
+      <ol>${ranking.map(m => `<li>${m.title}</li>`).join('')}</ol>
+    `;
+    document.getElementById('choices').innerHTML = '';
+  }
 
-    function showNextPair() {
-      if (remainingPairs.length === 0) {
-        showResults();
-        return;
-      }
+  function updateProgressBar() {
+    const progressBar = document.getElementById('progress-bar');
+    const total = (movies.length * (movies.length - 1)) / 2;
+    const completed = total - remainingComparisons.length;
+    const percent = (completed / total) * 100;
+    progressBar.style.width = percent + '%';
+  }
 
-      const [movieA, movieB] = remainingPairs.pop();
-      const container = document.getElementById("choices");
-      container.innerHTML = "";
-
-      [movieA, movieB].forEach(movie => {
-        const div = document.createElement("div");
-        div.className = "movie-option";
-        div.innerHTML = `
-          <img src="${movie.img}" alt="${movie.title}">
-          <div class="movie-title">${movie.title}</div>
-        `;
-        div.addEventListener("click", () => {
-          scores[movie.title]++;
-          showNextPair();
-        });
-        container.appendChild(div);
-      });
-    }
-
-    function showResults() {
-      const resultDiv = document.getElementById("result");
-      const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
-
-      resultDiv.innerHTML = "<h2>Your Ranked List:</h2><ol>" +
-        sorted.map(([title]) => `<li>${title}</li>`).join("") +
-        "</ol>";
-    }
-
-    showNextPair();
-
-    <div id="progress-container">
-  <div id="progress-bar"></div>
-</div>
-    
-  </script>
-    let currentStep = 0;
-    const totalSteps = 10;  // Adjust as necessary
-
-    function updateProgress() {
-      const progressBar = document.getElementById("progress-bar");
-      const percent = (currentStep / totalSteps) * 100;
-      progressBar.style.width = percent + "%";
-    }
-
-    // Call this function each time the user completes a choice
-    function userMadeChoice() {
-      currentStep++;
-      updateProgress();
-      // Load the next matchup, etc.
-    }
-</body>  
-</html>
+  initializeComparisons();
+</script>
